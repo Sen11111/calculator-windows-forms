@@ -1,0 +1,5 @@
+﻿  RPNmain.cpp
+C:\Users\Shade\Documents\GitHub\calculator-windows-forms\Reverse-Polish-Notation\Reverse-Polish-Notation\RPNmain.cpp(7,21): warning C4273: RPN: несовместимое связывание dll
+C:\Users\Shade\Documents\GitHub\calculator-windows-forms\Reverse-Polish-Notation\Reverse-Polish-Notation\HeaderExport.h(10,36): message : см. предыдущее определение "RPN"
+     Создается библиотека C:\Users\Shade\Documents\GitHub\calculator-windows-forms\Reverse-Polish-Notation\Debug\Reverse-Polish-Notation.lib и объект C:\Users\Shade\Documents\GitHub\calculator-windows-forms\Reverse-Polish-Notation\Debug\Reverse-Polish-Notation.exp
+  Reverse-Polish-Notation.vcxproj -> C:\Users\Shade\Documents\GitHub\calculator-windows-forms\Reverse-Polish-Notation\Debug\Reverse-Polish-Notation.dll
