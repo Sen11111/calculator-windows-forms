@@ -11,8 +11,8 @@
 #include <algorithm>
 #include <functional>
 #include <vector>
+#include <regex>
 
-#include "HeaderExport.h"
 
 namespace Calculator2WinForm {
 
@@ -36,47 +36,47 @@ namespace Calculator2WinForm {
 
 	private: System::Windows::Forms::TextBox^ textBox1;
 	private: System::Windows::Forms::TextBox^ textBox2;
-	private: System::Windows::Forms::Button^ button1;
-	private: System::Windows::Forms::Button^ button2;
-	private: System::Windows::Forms::Button^ button3;
-	private: System::Windows::Forms::Button^ button4;
-	private: System::Windows::Forms::Button^ button5;
-	private: System::Windows::Forms::Button^ button6;
-	private: System::Windows::Forms::Button^ button7;
-	private: System::Windows::Forms::Button^ button8;
-	private: System::Windows::Forms::Button^ button9;
-	private: System::Windows::Forms::Button^ button10;
-	private: System::Windows::Forms::Button^ button11;
-	private: System::Windows::Forms::Button^ button12;
-	private: System::Windows::Forms::Button^ button13;
-	private: System::Windows::Forms::Button^ button14;
-	private: System::Windows::Forms::Button^ button15;
-	private: System::Windows::Forms::Button^ button16;
-	private: System::Windows::Forms::Button^ button17;
-	private: System::Windows::Forms::Button^ button18;
-	private: System::Windows::Forms::Button^ button19;
-	private: System::Windows::Forms::Button^ button20;
-	private: System::Windows::Forms::Button^ button21;
-	private: System::Windows::Forms::Button^ button22;
-	private: System::Windows::Forms::Button^ button23;
-	private: System::Windows::Forms::Button^ button24;
-	private: System::Windows::Forms::Button^ button25;
-	private: System::Windows::Forms::Button^ button26;
-	private: System::Windows::Forms::Button^ button27;
-	private: System::Windows::Forms::Button^ button28;
-	private: System::Windows::Forms::Button^ button29;
-	private: System::Windows::Forms::Button^ button30;
-	private: System::Windows::Forms::Button^ button31;
-	private: System::Windows::Forms::Button^ button32;
-	private: System::Windows::Forms::Button^ button33;
-	private: System::Windows::Forms::Button^ button34;
-	private: System::Windows::Forms::Button^ button35;
+	private: System::Windows::Forms::Button^ powerX2;
+	private: System::Windows::Forms::Button^ powerXY;
+	private: System::Windows::Forms::Button^ Sin;
+	private: System::Windows::Forms::Button^ Cos;
+	private: System::Windows::Forms::Button^ Tan;
+	private: System::Windows::Forms::Button^ Sqrt;
+	private: System::Windows::Forms::Button^ Power10X;
+	private: System::Windows::Forms::Button^ Log;
+	private: System::Windows::Forms::Button^ exponent;
+	private: System::Windows::Forms::Button^ Mod;
+	private: System::Windows::Forms::Button^ ndPower2;
+	private: System::Windows::Forms::Button^ ClearAll;
+	private: System::Windows::Forms::Button^ Clear;
+	private: System::Windows::Forms::Button^ Backspace;
+	private: System::Windows::Forms::Button^ divide;
+	private: System::Windows::Forms::Button^ NumberPi;
+	private: System::Windows::Forms::Button^ multiply;
+	private: System::Windows::Forms::Button^ factorial;
+	private: System::Windows::Forms::Button^ Minus;
+	private: System::Windows::Forms::Button^ ReversePlusMinus;
+	private: System::Windows::Forms::Button^ Plus;
+	private: System::Windows::Forms::Button^ OpenBracket;
+	private: System::Windows::Forms::Button^ CloseBracket;
+	private: System::Windows::Forms::Button^ Dot;
+	private: System::Windows::Forms::Button^ equals;
+	private: System::Windows::Forms::Button^ Number0;
+	private: System::Windows::Forms::Button^ Number1;
+	private: System::Windows::Forms::Button^ Number2;
+	private: System::Windows::Forms::Button^ Number3;
+	private: System::Windows::Forms::Button^ Number4;
+	private: System::Windows::Forms::Button^ Number5;
+	private: System::Windows::Forms::Button^ Number6;
+	private: System::Windows::Forms::Button^ Number7;
+	private: System::Windows::Forms::Button^ Number8;
+	private: System::Windows::Forms::Button^ Number9;
 
-		   const double ee = 2.71828182846;
-		   int TextBoxZeroCounter = 0;
-		   int Obracket = 0;
-		   int Cbracket = 0;
-		   int ndSelector = 0;
+	const double ee = 2.71828182846;
+	int TextBoxZeroCounter = 0;
+	int Obracket = 0;
+	int Cbracket = 0;
+	int ndSelector = 0;
 
 	private: System::Void numberInput(System::String^ numVariable) {
 		String^ str = textBox1->Text;
@@ -95,6 +95,150 @@ namespace Calculator2WinForm {
 		else { if (str->Length < 10) { textBox1->Text = str + numVariable; } }
 	}
 
+		   double RPN(std::string inString) {
+
+			   // split string
+			   std::regex ws_re("\\s+");
+			   std::stack <std::string> ReverseStack;
+			   std::vector<std::string> result{
+				   std::sregex_token_iterator(inString.begin(), inString.end(), ws_re, -1), {}
+			   };
+			   for (unsigned int i = 0; i < result.size(); i++) {
+				   ReverseStack.push(result[i]);
+			   }
+
+			   // reverse string
+			   std::stack <std::string> inp;
+			   while (!ReverseStack.empty()) {
+				   inp.push(ReverseStack.top());
+				   ReverseStack.pop();
+			   }
+
+			   // Sort Facility
+			   std::stack <std::string> exitString;
+			   std::stack <std::string> funcStack;
+
+			   while (!inp.empty()) {
+				   std::string str = inp.top();
+				   inp.pop();
+				   size_t foundIsdigitAndMin = str.find_first_not_of("1234567890.-");
+				   if (foundIsdigitAndMin == std::string::npos && str != "-") {
+						exitString.push(str);
+				   }
+				   if (str == "(") {
+					   funcStack.push(str);
+				   }
+				   else if (str == ")") {
+					   try {
+						   while (funcStack.top() != "(") {
+							   exitString.push(funcStack.top());
+							   funcStack.pop();
+						   }
+					   }
+					   catch (...) {
+						   return -1;
+					   }
+					   funcStack.pop();
+				   }
+				   else if (str == "+" || str == "-" || str == "*" || str == "/" ||
+							str == "^" || str == "%" || str == "s") {
+
+					   // 1 s ^      2 % / *      3 + -
+					   int strPriority = 5;
+					   int stackPriority = 5;
+					   if (str == "+" || str == "-") {
+						   strPriority = 3;
+					   }
+					   else if (str == "*" || str == "/" || str == "%") {
+						   strPriority = 2;
+					   }
+					   else if (str == "^" || str == "s") {
+						   strPriority = 1;
+					   }
+					   while (true) { //---------------------------------------------------------
+						   if (!funcStack.empty()) {
+							   if (funcStack.top() == "+" || funcStack.top() == "-") {
+								   stackPriority = 3;
+							   }
+							   else if (funcStack.top() == "*" || funcStack.top() == "/" || funcStack.top() == "%") {
+								   stackPriority = 2;
+							   }
+							   else if (funcStack.top() == "^" || funcStack.top() == "s") {
+								   stackPriority = 1;
+							   }
+							   else if (funcStack.top() == "(") {
+								   stackPriority = 5;
+							   }
+
+							   if (stackPriority <= strPriority) {
+								   exitString.push(funcStack.top());
+								   funcStack.pop();
+							   }
+							   else break;
+						   }
+						   else break;
+					   }
+					   funcStack.push(str);
+				   }
+			   }
+			   while (!funcStack.empty()) {
+				   exitString.push(funcStack.top());
+				   funcStack.pop();
+			   }
+
+			   // Calculating reverse polish notation
+			   while (!exitString.empty()) {
+				   funcStack.push(exitString.top());
+				   exitString.pop();
+			   }
+
+			   while (!funcStack.empty()) {
+				   std::string str = funcStack.top();
+				   size_t foundIsdigitAndMin = str.find_first_not_of("1234567890.-");
+				   if (foundIsdigitAndMin == std::string::npos && str != "-") {
+					   exitString.push(str);
+					   funcStack.pop();
+				   }
+				   else if (str == "+" || str == "-" || str == "*" || str == "/" ||
+							str == "^" || str == "%" || str == "s") {
+					   if (exitString.size() < 2 && funcStack.size() <= 1) break;
+					   double rOperand = stof(exitString.top());
+					   exitString.pop();
+					   double lOperand = stof(exitString.top());
+					   exitString.pop();
+					   if (str == "+") {
+						   funcStack.pop();
+						   exitString.push(std::to_string(lOperand + rOperand));
+					   }
+					   else if (str == "-") {
+						   funcStack.pop();
+						   exitString.push(std::to_string(lOperand - rOperand));
+					   }
+					   else if (str == "*") {
+						   funcStack.pop();
+						   exitString.push(std::to_string(lOperand * rOperand));
+					   }
+					   else if (str == "/") {
+						   funcStack.pop();
+						   exitString.push(std::to_string(lOperand / rOperand));
+					   }
+					   else if (str == "%") {
+						   funcStack.pop();
+						   exitString.push(std::to_string(fmod(lOperand, rOperand)));
+					   }
+					   else if (str == "^") {
+						   funcStack.pop();
+						   exitString.push(std::to_string(pow(lOperand, rOperand)));
+					   }
+					   else if (str == "s") {
+						   funcStack.pop();
+						   exitString.push(std::to_string(pow(lOperand, 1 / rOperand)));
+					   }
+				   }
+			   }
+			   return atof(exitString.top().c_str());
+		   }
+
 	private: System::Double fact(double N) {
 		if (N < 0) return 0;
 		if (N == 0) return 1;
@@ -105,41 +249,41 @@ namespace Calculator2WinForm {
 #pragma region Windows Form Designer generated code
 		   void InitializeComponent(void) {
 			   this->textBox1 = (gcnew System::Windows::Forms::TextBox());
-			   this->button1 = (gcnew System::Windows::Forms::Button());
-			   this->button2 = (gcnew System::Windows::Forms::Button());
-			   this->button3 = (gcnew System::Windows::Forms::Button());
-			   this->button4 = (gcnew System::Windows::Forms::Button());
-			   this->button5 = (gcnew System::Windows::Forms::Button());
-			   this->button6 = (gcnew System::Windows::Forms::Button());
-			   this->button7 = (gcnew System::Windows::Forms::Button());
-			   this->button8 = (gcnew System::Windows::Forms::Button());
-			   this->button9 = (gcnew System::Windows::Forms::Button());
-			   this->button10 = (gcnew System::Windows::Forms::Button());
-			   this->button11 = (gcnew System::Windows::Forms::Button());
-			   this->button12 = (gcnew System::Windows::Forms::Button());
-			   this->button13 = (gcnew System::Windows::Forms::Button());
-			   this->button14 = (gcnew System::Windows::Forms::Button());
-			   this->button15 = (gcnew System::Windows::Forms::Button());
-			   this->button16 = (gcnew System::Windows::Forms::Button());
-			   this->button17 = (gcnew System::Windows::Forms::Button());
-			   this->button18 = (gcnew System::Windows::Forms::Button());
-			   this->button19 = (gcnew System::Windows::Forms::Button());
-			   this->button20 = (gcnew System::Windows::Forms::Button());
-			   this->button21 = (gcnew System::Windows::Forms::Button());
-			   this->button22 = (gcnew System::Windows::Forms::Button());
-			   this->button23 = (gcnew System::Windows::Forms::Button());
-			   this->button24 = (gcnew System::Windows::Forms::Button());
-			   this->button25 = (gcnew System::Windows::Forms::Button());
-			   this->button26 = (gcnew System::Windows::Forms::Button());
-			   this->button27 = (gcnew System::Windows::Forms::Button());
-			   this->button28 = (gcnew System::Windows::Forms::Button());
-			   this->button29 = (gcnew System::Windows::Forms::Button());
-			   this->button30 = (gcnew System::Windows::Forms::Button());
-			   this->button31 = (gcnew System::Windows::Forms::Button());
-			   this->button32 = (gcnew System::Windows::Forms::Button());
-			   this->button33 = (gcnew System::Windows::Forms::Button());
-			   this->button34 = (gcnew System::Windows::Forms::Button());
-			   this->button35 = (gcnew System::Windows::Forms::Button());
+			   this->powerX2 = (gcnew System::Windows::Forms::Button());
+			   this->powerXY = (gcnew System::Windows::Forms::Button());
+			   this->Sin = (gcnew System::Windows::Forms::Button());
+			   this->Cos = (gcnew System::Windows::Forms::Button());
+			   this->Tan = (gcnew System::Windows::Forms::Button());
+			   this->Sqrt = (gcnew System::Windows::Forms::Button());
+			   this->Power10X = (gcnew System::Windows::Forms::Button());
+			   this->Log = (gcnew System::Windows::Forms::Button());
+			   this->exponent = (gcnew System::Windows::Forms::Button());
+			   this->Mod = (gcnew System::Windows::Forms::Button());
+			   this->ndPower2 = (gcnew System::Windows::Forms::Button());
+			   this->ClearAll = (gcnew System::Windows::Forms::Button());
+			   this->Clear = (gcnew System::Windows::Forms::Button());
+			   this->Backspace = (gcnew System::Windows::Forms::Button());
+			   this->divide = (gcnew System::Windows::Forms::Button());
+			   this->NumberPi = (gcnew System::Windows::Forms::Button());
+			   this->multiply = (gcnew System::Windows::Forms::Button());
+			   this->factorial = (gcnew System::Windows::Forms::Button());
+			   this->Minus = (gcnew System::Windows::Forms::Button());
+			   this->ReversePlusMinus = (gcnew System::Windows::Forms::Button());
+			   this->Plus = (gcnew System::Windows::Forms::Button());
+			   this->OpenBracket = (gcnew System::Windows::Forms::Button());
+			   this->CloseBracket = (gcnew System::Windows::Forms::Button());
+			   this->Dot = (gcnew System::Windows::Forms::Button());
+			   this->equals = (gcnew System::Windows::Forms::Button());
+			   this->Number0 = (gcnew System::Windows::Forms::Button());
+			   this->Number1 = (gcnew System::Windows::Forms::Button());
+			   this->Number2 = (gcnew System::Windows::Forms::Button());
+			   this->Number3 = (gcnew System::Windows::Forms::Button());
+			   this->Number4 = (gcnew System::Windows::Forms::Button());
+			   this->Number5 = (gcnew System::Windows::Forms::Button());
+			   this->Number6 = (gcnew System::Windows::Forms::Button());
+			   this->Number7 = (gcnew System::Windows::Forms::Button());
+			   this->Number8 = (gcnew System::Windows::Forms::Button());
+			   this->Number9 = (gcnew System::Windows::Forms::Button());
 			   this->textBox2 = (gcnew System::Windows::Forms::TextBox());
 			   this->SuspendLayout();
 			   // 
@@ -157,365 +301,365 @@ namespace Calculator2WinForm {
 			   this->textBox1->TextAlign = System::Windows::Forms::HorizontalAlignment::Right;
 			   this->textBox1->TextChanged += gcnew System::EventHandler(this, &MyForm::textBox1_TextChanged);
 			   // 
-			   // button1
-			   // 
-			   this->button1->Location = System::Drawing::Point(12, 169);
-			   this->button1->Name = L"button1";
-			   this->button1->Size = System::Drawing::Size(67, 50);
-			   this->button1->TabIndex = 6;
-			   this->button1->Text = L"x^2 ";
-			   this->button1->UseVisualStyleBackColor = true;
-			   this->button1->Click += gcnew System::EventHandler(this, &MyForm::button1_Click);
-			   // 
-			   // button2
-			   // 
-			   this->button2->Location = System::Drawing::Point(85, 169);
-			   this->button2->Name = L"button2";
-			   this->button2->Size = System::Drawing::Size(67, 50);
-			   this->button2->TabIndex = 7;
-			   this->button2->Text = L"x^y";
-			   this->button2->UseVisualStyleBackColor = true;
-			   this->button2->Click += gcnew System::EventHandler(this, &MyForm::button2_Click);
-			   // 
-			   // button3
-			   // 
-			   this->button3->Location = System::Drawing::Point(158, 169);
-			   this->button3->Name = L"button3";
-			   this->button3->Size = System::Drawing::Size(67, 50);
-			   this->button3->TabIndex = 8;
-			   this->button3->Text = L"sin";
-			   this->button3->UseVisualStyleBackColor = true;
-			   this->button3->Click += gcnew System::EventHandler(this, &MyForm::button3_Click);
-			   // 
-			   // button4
-			   // 
-			   this->button4->Location = System::Drawing::Point(231, 169);
-			   this->button4->Name = L"button4";
-			   this->button4->Size = System::Drawing::Size(67, 50);
-			   this->button4->TabIndex = 9;
-			   this->button4->Text = L"cos";
-			   this->button4->UseVisualStyleBackColor = true;
-			   this->button4->Click += gcnew System::EventHandler(this, &MyForm::button4_Click);
-			   // 
-			   // button5
-			   // 
-			   this->button5->Location = System::Drawing::Point(304, 169);
-			   this->button5->Name = L"button5";
-			   this->button5->Size = System::Drawing::Size(67, 50);
-			   this->button5->TabIndex = 10;
-			   this->button5->Text = L"tan";
-			   this->button5->UseVisualStyleBackColor = true;
-			   this->button5->Click += gcnew System::EventHandler(this, &MyForm::button5_Click);
-			   // 
-			   // button6
-			   // 
-			   this->button6->Location = System::Drawing::Point(12, 225);
-			   this->button6->Name = L"button6";
-			   this->button6->Size = System::Drawing::Size(67, 50);
-			   this->button6->TabIndex = 11;
-			   this->button6->Text = L"sqrt(x)";
-			   this->button6->UseVisualStyleBackColor = true;
-			   this->button6->Click += gcnew System::EventHandler(this, &MyForm::button6_Click);
-			   // 
-			   // button7
-			   // 
-			   this->button7->Location = System::Drawing::Point(85, 225);
-			   this->button7->Name = L"button7";
-			   this->button7->Size = System::Drawing::Size(67, 50);
-			   this->button7->TabIndex = 12;
-			   this->button7->Text = L"10^x";
-			   this->button7->UseVisualStyleBackColor = true;
-			   this->button7->Click += gcnew System::EventHandler(this, &MyForm::button7_Click);
-			   // 
-			   // button8
-			   // 
-			   this->button8->Location = System::Drawing::Point(158, 225);
-			   this->button8->Name = L"button8";
-			   this->button8->Size = System::Drawing::Size(67, 50);
-			   this->button8->TabIndex = 13;
-			   this->button8->Text = L"log";
-			   this->button8->UseVisualStyleBackColor = true;
-			   this->button8->Click += gcnew System::EventHandler(this, &MyForm::button8_Click);
-			   // 
-			   // button9
-			   // 
-			   this->button9->Location = System::Drawing::Point(231, 225);
-			   this->button9->Name = L"button9";
-			   this->button9->Size = System::Drawing::Size(67, 50);
-			   this->button9->TabIndex = 14;
-			   this->button9->Text = L"Exp";
-			   this->button9->UseVisualStyleBackColor = true;
-			   this->button9->Click += gcnew System::EventHandler(this, &MyForm::button9_Click);
-			   // 
-			   // button10
-			   // 
-			   this->button10->Location = System::Drawing::Point(303, 225);
-			   this->button10->Name = L"button10";
-			   this->button10->Size = System::Drawing::Size(67, 50);
-			   this->button10->TabIndex = 15;
-			   this->button10->Text = L"Mod";
-			   this->button10->UseVisualStyleBackColor = true;
-			   this->button10->Click += gcnew System::EventHandler(this, &MyForm::button10_Click);
-			   // 
-			   // button11
-			   // 
-			   this->button11->Location = System::Drawing::Point(12, 281);
-			   this->button11->Name = L"button11";
-			   this->button11->Size = System::Drawing::Size(67, 50);
-			   this->button11->TabIndex = 16;
-			   this->button11->Text = L"2^nd";
-			   this->button11->UseVisualStyleBackColor = true;
-			   this->button11->Click += gcnew System::EventHandler(this, &MyForm::button11_Click);
-			   // 
-			   // button12
-			   // 
-			   this->button12->Location = System::Drawing::Point(85, 281);
-			   this->button12->Name = L"button12";
-			   this->button12->Size = System::Drawing::Size(67, 50);
-			   this->button12->TabIndex = 17;
-			   this->button12->Text = L"CE";
-			   this->button12->UseVisualStyleBackColor = true;
-			   this->button12->Click += gcnew System::EventHandler(this, &MyForm::button12_Click);
-			   // 
-			   // button13
-			   // 
-			   this->button13->Location = System::Drawing::Point(158, 281);
-			   this->button13->Name = L"button13";
-			   this->button13->Size = System::Drawing::Size(67, 50);
-			   this->button13->TabIndex = 18;
-			   this->button13->Text = L"C";
-			   this->button13->UseVisualStyleBackColor = true;
-			   this->button13->Click += gcnew System::EventHandler(this, &MyForm::button13_Click);
-			   // 
-			   // button14
-			   // 
-			   this->button14->Location = System::Drawing::Point(231, 281);
-			   this->button14->Name = L"button14";
-			   this->button14->Size = System::Drawing::Size(67, 50);
-			   this->button14->TabIndex = 19;
-			   this->button14->Text = L"Backspace";
-			   this->button14->UseVisualStyleBackColor = true;
-			   this->button14->Click += gcnew System::EventHandler(this, &MyForm::button14_Click);
-			   // 
-			   // button15
-			   // 
-			   this->button15->Location = System::Drawing::Point(303, 281);
-			   this->button15->Name = L"button15";
-			   this->button15->Size = System::Drawing::Size(67, 50);
-			   this->button15->TabIndex = 20;
-			   this->button15->Text = L"/";
-			   this->button15->UseVisualStyleBackColor = true;
-			   this->button15->Click += gcnew System::EventHandler(this, &MyForm::button15_Click);
-			   // 
-			   // button16
-			   // 
-			   this->button16->Location = System::Drawing::Point(12, 337);
-			   this->button16->Name = L"button16";
-			   this->button16->Size = System::Drawing::Size(67, 50);
-			   this->button16->TabIndex = 21;
-			   this->button16->Text = L"Pi";
-			   this->button16->UseVisualStyleBackColor = true;
-			   this->button16->Click += gcnew System::EventHandler(this, &MyForm::button16_Click);
-			   // 
-			   // button17
-			   // 
-			   this->button17->Location = System::Drawing::Point(303, 337);
-			   this->button17->Name = L"button17";
-			   this->button17->Size = System::Drawing::Size(67, 50);
-			   this->button17->TabIndex = 22;
-			   this->button17->Text = L"*";
-			   this->button17->UseVisualStyleBackColor = true;
-			   this->button17->Click += gcnew System::EventHandler(this, &MyForm::button17_Click);
-			   // 
-			   // button18
-			   // 
-			   this->button18->Location = System::Drawing::Point(12, 393);
-			   this->button18->Name = L"button18";
-			   this->button18->Size = System::Drawing::Size(67, 50);
-			   this->button18->TabIndex = 23;
-			   this->button18->Text = L"n!";
-			   this->button18->UseVisualStyleBackColor = true;
-			   this->button18->Click += gcnew System::EventHandler(this, &MyForm::button18_Click);
-			   // 
-			   // button19
-			   // 
-			   this->button19->Location = System::Drawing::Point(304, 393);
-			   this->button19->Name = L"button19";
-			   this->button19->Size = System::Drawing::Size(67, 50);
-			   this->button19->TabIndex = 24;
-			   this->button19->Text = L"-";
-			   this->button19->UseVisualStyleBackColor = true;
-			   this->button19->Click += gcnew System::EventHandler(this, &MyForm::button19_Click);
-			   // 
-			   // button20
-			   // 
-			   this->button20->Location = System::Drawing::Point(12, 449);
-			   this->button20->Name = L"button20";
-			   this->button20->Size = System::Drawing::Size(67, 50);
-			   this->button20->TabIndex = 25;
-			   this->button20->Text = L"+/-";
-			   this->button20->UseVisualStyleBackColor = true;
-			   this->button20->Click += gcnew System::EventHandler(this, &MyForm::button20_Click);
-			   // 
-			   // button21
-			   // 
-			   this->button21->Location = System::Drawing::Point(303, 449);
-			   this->button21->Name = L"button21";
-			   this->button21->Size = System::Drawing::Size(67, 50);
-			   this->button21->TabIndex = 26;
-			   this->button21->Text = L"+";
-			   this->button21->UseVisualStyleBackColor = true;
-			   this->button21->Click += gcnew System::EventHandler(this, &MyForm::button21_Click);
-			   // 
-			   // button22
-			   // 
-			   this->button22->Location = System::Drawing::Point(12, 505);
-			   this->button22->Name = L"button22";
-			   this->button22->Size = System::Drawing::Size(67, 50);
-			   this->button22->TabIndex = 27;
-			   this->button22->Text = L"(";
-			   this->button22->UseVisualStyleBackColor = true;
-			   this->button22->Click += gcnew System::EventHandler(this, &MyForm::button22_Click);
-			   // 
-			   // button23
-			   // 
-			   this->button23->Location = System::Drawing::Point(85, 505);
-			   this->button23->Name = L"button23";
-			   this->button23->Size = System::Drawing::Size(67, 50);
-			   this->button23->TabIndex = 28;
-			   this->button23->Text = L")";
-			   this->button23->UseVisualStyleBackColor = true;
-			   this->button23->Click += gcnew System::EventHandler(this, &MyForm::button23_Click);
-			   // 
-			   // button24
-			   // 
-			   this->button24->Location = System::Drawing::Point(231, 505);
-			   this->button24->Name = L"button24";
-			   this->button24->Size = System::Drawing::Size(67, 50);
-			   this->button24->TabIndex = 29;
-			   this->button24->Text = L",";
-			   this->button24->UseVisualStyleBackColor = true;
-			   this->button24->Click += gcnew System::EventHandler(this, &MyForm::button24_Click);
-			   // 
-			   // button25
-			   // 
-			   this->button25->Location = System::Drawing::Point(304, 505);
-			   this->button25->Name = L"button25";
-			   this->button25->Size = System::Drawing::Size(67, 50);
-			   this->button25->TabIndex = 30;
-			   this->button25->Text = L"=";
-			   this->button25->UseVisualStyleBackColor = true;
-			   this->button25->Click += gcnew System::EventHandler(this, &MyForm::button25_Click);
-			   // 
-			   // button26
-			   // 
-			   this->button26->BackColor = System::Drawing::SystemColors::ButtonHighlight;
-			   this->button26->Location = System::Drawing::Point(158, 505);
-			   this->button26->Name = L"button26";
-			   this->button26->Size = System::Drawing::Size(67, 50);
-			   this->button26->TabIndex = 31;
-			   this->button26->Text = L"0";
-			   this->button26->UseVisualStyleBackColor = false;
-			   this->button26->Click += gcnew System::EventHandler(this, &MyForm::button26_Click);
-			   // 
-			   // button27
-			   // 
-			   this->button27->BackColor = System::Drawing::SystemColors::ButtonHighlight;
-			   this->button27->Location = System::Drawing::Point(85, 449);
-			   this->button27->Name = L"button27";
-			   this->button27->Size = System::Drawing::Size(67, 50);
-			   this->button27->TabIndex = 32;
-			   this->button27->Text = L"1";
-			   this->button27->UseVisualStyleBackColor = false;
-			   this->button27->Click += gcnew System::EventHandler(this, &MyForm::button27_Click);
-			   // 
-			   // button28
-			   // 
-			   this->button28->BackColor = System::Drawing::SystemColors::ButtonHighlight;
-			   this->button28->Location = System::Drawing::Point(158, 449);
-			   this->button28->Name = L"button28";
-			   this->button28->Size = System::Drawing::Size(67, 50);
-			   this->button28->TabIndex = 33;
-			   this->button28->Text = L"2";
-			   this->button28->UseVisualStyleBackColor = false;
-			   this->button28->Click += gcnew System::EventHandler(this, &MyForm::button28_Click);
-			   // 
-			   // button29
-			   // 
-			   this->button29->BackColor = System::Drawing::SystemColors::ButtonHighlight;
-			   this->button29->Location = System::Drawing::Point(231, 449);
-			   this->button29->Name = L"button29";
-			   this->button29->Size = System::Drawing::Size(67, 50);
-			   this->button29->TabIndex = 34;
-			   this->button29->Text = L"3";
-			   this->button29->UseVisualStyleBackColor = false;
-			   this->button29->Click += gcnew System::EventHandler(this, &MyForm::button29_Click);
-			   // 
-			   // button30
-			   // 
-			   this->button30->BackColor = System::Drawing::SystemColors::ButtonHighlight;
-			   this->button30->Location = System::Drawing::Point(85, 393);
-			   this->button30->Name = L"button30";
-			   this->button30->Size = System::Drawing::Size(67, 50);
-			   this->button30->TabIndex = 35;
-			   this->button30->Text = L"4";
-			   this->button30->UseVisualStyleBackColor = false;
-			   this->button30->Click += gcnew System::EventHandler(this, &MyForm::button30_Click);
-			   // 
-			   // button31
-			   // 
-			   this->button31->BackColor = System::Drawing::SystemColors::ButtonHighlight;
-			   this->button31->Location = System::Drawing::Point(158, 393);
-			   this->button31->Name = L"button31";
-			   this->button31->Size = System::Drawing::Size(67, 50);
-			   this->button31->TabIndex = 36;
-			   this->button31->Text = L"5";
-			   this->button31->UseVisualStyleBackColor = false;
-			   this->button31->Click += gcnew System::EventHandler(this, &MyForm::button31_Click);
-			   // 
-			   // button32
-			   // 
-			   this->button32->BackColor = System::Drawing::SystemColors::ButtonHighlight;
-			   this->button32->Location = System::Drawing::Point(231, 393);
-			   this->button32->Name = L"button32";
-			   this->button32->Size = System::Drawing::Size(67, 50);
-			   this->button32->TabIndex = 37;
-			   this->button32->Text = L"6";
-			   this->button32->UseVisualStyleBackColor = false;
-			   this->button32->Click += gcnew System::EventHandler(this, &MyForm::button32_Click);
-			   // 
-			   // button33
-			   // 
-			   this->button33->BackColor = System::Drawing::SystemColors::ButtonHighlight;
-			   this->button33->Location = System::Drawing::Point(85, 337);
-			   this->button33->Name = L"button33";
-			   this->button33->Size = System::Drawing::Size(67, 50);
-			   this->button33->TabIndex = 38;
-			   this->button33->Text = L"7";
-			   this->button33->UseVisualStyleBackColor = false;
-			   this->button33->Click += gcnew System::EventHandler(this, &MyForm::button33_Click);
-			   // 
-			   // button34
-			   // 
-			   this->button34->BackColor = System::Drawing::SystemColors::ButtonHighlight;
-			   this->button34->Location = System::Drawing::Point(158, 337);
-			   this->button34->Name = L"button34";
-			   this->button34->Size = System::Drawing::Size(67, 50);
-			   this->button34->TabIndex = 39;
-			   this->button34->Text = L"8";
-			   this->button34->UseVisualStyleBackColor = false;
-			   this->button34->Click += gcnew System::EventHandler(this, &MyForm::button34_Click);
-			   // 
-			   // button35
-			   // 
-			   this->button35->BackColor = System::Drawing::SystemColors::ButtonHighlight;
-			   this->button35->Location = System::Drawing::Point(230, 337);
-			   this->button35->Name = L"button35";
-			   this->button35->Size = System::Drawing::Size(67, 50);
-			   this->button35->TabIndex = 40;
-			   this->button35->Text = L"9";
-			   this->button35->UseVisualStyleBackColor = false;
-			   this->button35->Click += gcnew System::EventHandler(this, &MyForm::button35_Click);
+			   // powerX2
+			   // 
+			   this->powerX2->Location = System::Drawing::Point(12, 169);
+			   this->powerX2->Name = L"powerX2";
+			   this->powerX2->Size = System::Drawing::Size(67, 50);
+			   this->powerX2->TabIndex = 6;
+			   this->powerX2->Text = L"x^2 ";
+			   this->powerX2->UseVisualStyleBackColor = true;
+			   this->powerX2->Click += gcnew System::EventHandler(this, &MyForm::button1_Click);
+			   // 
+			   // powerXY
+			   // 
+			   this->powerXY->Location = System::Drawing::Point(85, 169);
+			   this->powerXY->Name = L"powerXY";
+			   this->powerXY->Size = System::Drawing::Size(67, 50);
+			   this->powerXY->TabIndex = 7;
+			   this->powerXY->Text = L"x^y";
+			   this->powerXY->UseVisualStyleBackColor = true;
+			   this->powerXY->Click += gcnew System::EventHandler(this, &MyForm::button2_Click);
+			   // 
+			   // Sin
+			   // 
+			   this->Sin->Location = System::Drawing::Point(158, 169);
+			   this->Sin->Name = L"Sin";
+			   this->Sin->Size = System::Drawing::Size(67, 50);
+			   this->Sin->TabIndex = 8;
+			   this->Sin->Text = L"sin";
+			   this->Sin->UseVisualStyleBackColor = true;
+			   this->Sin->Click += gcnew System::EventHandler(this, &MyForm::button3_Click);
+			   // 
+			   // Cos
+			   // 
+			   this->Cos->Location = System::Drawing::Point(231, 169);
+			   this->Cos->Name = L"Cos";
+			   this->Cos->Size = System::Drawing::Size(67, 50);
+			   this->Cos->TabIndex = 9;
+			   this->Cos->Text = L"cos";
+			   this->Cos->UseVisualStyleBackColor = true;
+			   this->Cos->Click += gcnew System::EventHandler(this, &MyForm::button4_Click);
+			   // 
+			   // Tan
+			   // 
+			   this->Tan->Location = System::Drawing::Point(304, 169);
+			   this->Tan->Name = L"Tan";
+			   this->Tan->Size = System::Drawing::Size(67, 50);
+			   this->Tan->TabIndex = 10;
+			   this->Tan->Text = L"tan";
+			   this->Tan->UseVisualStyleBackColor = true;
+			   this->Tan->Click += gcnew System::EventHandler(this, &MyForm::button5_Click);
+			   // 
+			   // Sqrt
+			   // 
+			   this->Sqrt->Location = System::Drawing::Point(12, 225);
+			   this->Sqrt->Name = L"Sqrt";
+			   this->Sqrt->Size = System::Drawing::Size(67, 50);
+			   this->Sqrt->TabIndex = 11;
+			   this->Sqrt->Text = L"sqrt(x)";
+			   this->Sqrt->UseVisualStyleBackColor = true;
+			   this->Sqrt->Click += gcnew System::EventHandler(this, &MyForm::button6_Click);
+			   // 
+			   // Power10X
+			   // 
+			   this->Power10X->Location = System::Drawing::Point(85, 225);
+			   this->Power10X->Name = L"Power10X";
+			   this->Power10X->Size = System::Drawing::Size(67, 50);
+			   this->Power10X->TabIndex = 12;
+			   this->Power10X->Text = L"10^x";
+			   this->Power10X->UseVisualStyleBackColor = true;
+			   this->Power10X->Click += gcnew System::EventHandler(this, &MyForm::button7_Click);
+			   // 
+			   // Log
+			   // 
+			   this->Log->Location = System::Drawing::Point(158, 225);
+			   this->Log->Name = L"Log";
+			   this->Log->Size = System::Drawing::Size(67, 50);
+			   this->Log->TabIndex = 13;
+			   this->Log->Text = L"log";
+			   this->Log->UseVisualStyleBackColor = true;
+			   this->Log->Click += gcnew System::EventHandler(this, &MyForm::button8_Click);
+			   // 
+			   // exponent
+			   // 
+			   this->exponent->Location = System::Drawing::Point(231, 225);
+			   this->exponent->Name = L"exponent";
+			   this->exponent->Size = System::Drawing::Size(67, 50);
+			   this->exponent->TabIndex = 14;
+			   this->exponent->Text = L"Exp";
+			   this->exponent->UseVisualStyleBackColor = true;
+			   this->exponent->Click += gcnew System::EventHandler(this, &MyForm::button9_Click);
+			   // 
+			   // Mod
+			   // 
+			   this->Mod->Location = System::Drawing::Point(303, 225);
+			   this->Mod->Name = L"Mod";
+			   this->Mod->Size = System::Drawing::Size(67, 50);
+			   this->Mod->TabIndex = 15;
+			   this->Mod->Text = L"Mod";
+			   this->Mod->UseVisualStyleBackColor = true;
+			   this->Mod->Click += gcnew System::EventHandler(this, &MyForm::button10_Click);
+			   // 
+			   // ndPower2
+			   // 
+			   this->ndPower2->Location = System::Drawing::Point(12, 281);
+			   this->ndPower2->Name = L"ndPower2";
+			   this->ndPower2->Size = System::Drawing::Size(67, 50);
+			   this->ndPower2->TabIndex = 16;
+			   this->ndPower2->Text = L"2^nd";
+			   this->ndPower2->UseVisualStyleBackColor = true;
+			   this->ndPower2->Click += gcnew System::EventHandler(this, &MyForm::button11_Click);
+			   // 
+			   // ClearAll
+			   // 
+			   this->ClearAll->Location = System::Drawing::Point(85, 281);
+			   this->ClearAll->Name = L"ClearAll";
+			   this->ClearAll->Size = System::Drawing::Size(67, 50);
+			   this->ClearAll->TabIndex = 17;
+			   this->ClearAll->Text = L"CE";
+			   this->ClearAll->UseVisualStyleBackColor = true;
+			   this->ClearAll->Click += gcnew System::EventHandler(this, &MyForm::button12_Click);
+			   // 
+			   // Clear
+			   // 
+			   this->Clear->Location = System::Drawing::Point(158, 281);
+			   this->Clear->Name = L"Clear";
+			   this->Clear->Size = System::Drawing::Size(67, 50);
+			   this->Clear->TabIndex = 18;
+			   this->Clear->Text = L"C";
+			   this->Clear->UseVisualStyleBackColor = true;
+			   this->Clear->Click += gcnew System::EventHandler(this, &MyForm::button13_Click);
+			   // 
+			   // Backspace
+			   // 
+			   this->Backspace->Location = System::Drawing::Point(231, 281);
+			   this->Backspace->Name = L"Backspace";
+			   this->Backspace->Size = System::Drawing::Size(67, 50);
+			   this->Backspace->TabIndex = 19;
+			   this->Backspace->Text = L"Backspace";
+			   this->Backspace->UseVisualStyleBackColor = true;
+			   this->Backspace->Click += gcnew System::EventHandler(this, &MyForm::button14_Click);
+			   // 
+			   // divide
+			   // 
+			   this->divide->Location = System::Drawing::Point(303, 281);
+			   this->divide->Name = L"divide";
+			   this->divide->Size = System::Drawing::Size(67, 50);
+			   this->divide->TabIndex = 20;
+			   this->divide->Text = L"/";
+			   this->divide->UseVisualStyleBackColor = true;
+			   this->divide->Click += gcnew System::EventHandler(this, &MyForm::button15_Click);
+			   // 
+			   // NumberPi
+			   // 
+			   this->NumberPi->Location = System::Drawing::Point(12, 337);
+			   this->NumberPi->Name = L"NumberPi";
+			   this->NumberPi->Size = System::Drawing::Size(67, 50);
+			   this->NumberPi->TabIndex = 21;
+			   this->NumberPi->Text = L"Pi";
+			   this->NumberPi->UseVisualStyleBackColor = true;
+			   this->NumberPi->Click += gcnew System::EventHandler(this, &MyForm::button16_Click);
+			   // 
+			   // multiply
+			   // 
+			   this->multiply->Location = System::Drawing::Point(303, 337);
+			   this->multiply->Name = L"multiply";
+			   this->multiply->Size = System::Drawing::Size(67, 50);
+			   this->multiply->TabIndex = 22;
+			   this->multiply->Text = L"*";
+			   this->multiply->UseVisualStyleBackColor = true;
+			   this->multiply->Click += gcnew System::EventHandler(this, &MyForm::button17_Click);
+			   // 
+			   // factorial
+			   // 
+			   this->factorial->Location = System::Drawing::Point(12, 393);
+			   this->factorial->Name = L"factorial";
+			   this->factorial->Size = System::Drawing::Size(67, 50);
+			   this->factorial->TabIndex = 23;
+			   this->factorial->Text = L"n!";
+			   this->factorial->UseVisualStyleBackColor = true;
+			   this->factorial->Click += gcnew System::EventHandler(this, &MyForm::button18_Click);
+			   // 
+			   // Minus
+			   // 
+			   this->Minus->Location = System::Drawing::Point(304, 393);
+			   this->Minus->Name = L"Minus";
+			   this->Minus->Size = System::Drawing::Size(67, 50);
+			   this->Minus->TabIndex = 24;
+			   this->Minus->Text = L"-";
+			   this->Minus->UseVisualStyleBackColor = true;
+			   this->Minus->Click += gcnew System::EventHandler(this, &MyForm::button19_Click);
+			   // 
+			   // ReversePlusMinus
+			   // 
+			   this->ReversePlusMinus->Location = System::Drawing::Point(12, 449);
+			   this->ReversePlusMinus->Name = L"ReversePlusMinus";
+			   this->ReversePlusMinus->Size = System::Drawing::Size(67, 50);
+			   this->ReversePlusMinus->TabIndex = 25;
+			   this->ReversePlusMinus->Text = L"+/-";
+			   this->ReversePlusMinus->UseVisualStyleBackColor = true;
+			   this->ReversePlusMinus->Click += gcnew System::EventHandler(this, &MyForm::button20_Click);
+			   // 
+			   // Plus
+			   // 
+			   this->Plus->Location = System::Drawing::Point(303, 449);
+			   this->Plus->Name = L"Plus";
+			   this->Plus->Size = System::Drawing::Size(67, 50);
+			   this->Plus->TabIndex = 26;
+			   this->Plus->Text = L"+";
+			   this->Plus->UseVisualStyleBackColor = true;
+			   this->Plus->Click += gcnew System::EventHandler(this, &MyForm::button21_Click);
+			   // 
+			   // OpenBracket
+			   // 
+			   this->OpenBracket->Location = System::Drawing::Point(12, 505);
+			   this->OpenBracket->Name = L"OpenBracket";
+			   this->OpenBracket->Size = System::Drawing::Size(67, 50);
+			   this->OpenBracket->TabIndex = 27;
+			   this->OpenBracket->Text = L"(";
+			   this->OpenBracket->UseVisualStyleBackColor = true;
+			   this->OpenBracket->Click += gcnew System::EventHandler(this, &MyForm::button22_Click);
+			   // 
+			   // CloseBracket
+			   // 
+			   this->CloseBracket->Location = System::Drawing::Point(85, 505);
+			   this->CloseBracket->Name = L"CloseBracket";
+			   this->CloseBracket->Size = System::Drawing::Size(67, 50);
+			   this->CloseBracket->TabIndex = 28;
+			   this->CloseBracket->Text = L")";
+			   this->CloseBracket->UseVisualStyleBackColor = true;
+			   this->CloseBracket->Click += gcnew System::EventHandler(this, &MyForm::button23_Click);
+			   // 
+			   // Dot
+			   // 
+			   this->Dot->Location = System::Drawing::Point(231, 505);
+			   this->Dot->Name = L"Dot";
+			   this->Dot->Size = System::Drawing::Size(67, 50);
+			   this->Dot->TabIndex = 29;
+			   this->Dot->Text = L",";
+			   this->Dot->UseVisualStyleBackColor = true;
+			   this->Dot->Click += gcnew System::EventHandler(this, &MyForm::button24_Click);
+			   // 
+			   // equals
+			   // 
+			   this->equals->Location = System::Drawing::Point(304, 505);
+			   this->equals->Name = L"equals";
+			   this->equals->Size = System::Drawing::Size(67, 50);
+			   this->equals->TabIndex = 30;
+			   this->equals->Text = L"=";
+			   this->equals->UseVisualStyleBackColor = true;
+			   this->equals->Click += gcnew System::EventHandler(this, &MyForm::button25_Click);
+			   // 
+			   // Number0
+			   // 
+			   this->Number0->BackColor = System::Drawing::SystemColors::ButtonHighlight;
+			   this->Number0->Location = System::Drawing::Point(158, 505);
+			   this->Number0->Name = L"Number0";
+			   this->Number0->Size = System::Drawing::Size(67, 50);
+			   this->Number0->TabIndex = 31;
+			   this->Number0->Text = L"0";
+			   this->Number0->UseVisualStyleBackColor = false;
+			   this->Number0->Click += gcnew System::EventHandler(this, &MyForm::button26_Click);
+			   // 
+			   // Number1
+			   // 
+			   this->Number1->BackColor = System::Drawing::SystemColors::ButtonHighlight;
+			   this->Number1->Location = System::Drawing::Point(85, 449);
+			   this->Number1->Name = L"Number1";
+			   this->Number1->Size = System::Drawing::Size(67, 50);
+			   this->Number1->TabIndex = 32;
+			   this->Number1->Text = L"1";
+			   this->Number1->UseVisualStyleBackColor = false;
+			   this->Number1->Click += gcnew System::EventHandler(this, &MyForm::button27_Click);
+			   // 
+			   // Number2
+			   // 
+			   this->Number2->BackColor = System::Drawing::SystemColors::ButtonHighlight;
+			   this->Number2->Location = System::Drawing::Point(158, 449);
+			   this->Number2->Name = L"Number2";
+			   this->Number2->Size = System::Drawing::Size(67, 50);
+			   this->Number2->TabIndex = 33;
+			   this->Number2->Text = L"2";
+			   this->Number2->UseVisualStyleBackColor = false;
+			   this->Number2->Click += gcnew System::EventHandler(this, &MyForm::button28_Click);
+			   // 
+			   // Number3
+			   // 
+			   this->Number3->BackColor = System::Drawing::SystemColors::ButtonHighlight;
+			   this->Number3->Location = System::Drawing::Point(231, 449);
+			   this->Number3->Name = L"Number3";
+			   this->Number3->Size = System::Drawing::Size(67, 50);
+			   this->Number3->TabIndex = 34;
+			   this->Number3->Text = L"3";
+			   this->Number3->UseVisualStyleBackColor = false;
+			   this->Number3->Click += gcnew System::EventHandler(this, &MyForm::button29_Click);
+			   // 
+			   // Number4
+			   // 
+			   this->Number4->BackColor = System::Drawing::SystemColors::ButtonHighlight;
+			   this->Number4->Location = System::Drawing::Point(85, 393);
+			   this->Number4->Name = L"Number4";
+			   this->Number4->Size = System::Drawing::Size(67, 50);
+			   this->Number4->TabIndex = 35;
+			   this->Number4->Text = L"4";
+			   this->Number4->UseVisualStyleBackColor = false;
+			   this->Number4->Click += gcnew System::EventHandler(this, &MyForm::button30_Click);
+			   // 
+			   // Number5
+			   // 
+			   this->Number5->BackColor = System::Drawing::SystemColors::ButtonHighlight;
+			   this->Number5->Location = System::Drawing::Point(158, 393);
+			   this->Number5->Name = L"Number5";
+			   this->Number5->Size = System::Drawing::Size(67, 50);
+			   this->Number5->TabIndex = 36;
+			   this->Number5->Text = L"5";
+			   this->Number5->UseVisualStyleBackColor = false;
+			   this->Number5->Click += gcnew System::EventHandler(this, &MyForm::button31_Click);
+			   // 
+			   // Number6
+			   // 
+			   this->Number6->BackColor = System::Drawing::SystemColors::ButtonHighlight;
+			   this->Number6->Location = System::Drawing::Point(231, 393);
+			   this->Number6->Name = L"Number6";
+			   this->Number6->Size = System::Drawing::Size(67, 50);
+			   this->Number6->TabIndex = 37;
+			   this->Number6->Text = L"6";
+			   this->Number6->UseVisualStyleBackColor = false;
+			   this->Number6->Click += gcnew System::EventHandler(this, &MyForm::button32_Click);
+			   // 
+			   // Number7
+			   // 
+			   this->Number7->BackColor = System::Drawing::SystemColors::ButtonHighlight;
+			   this->Number7->Location = System::Drawing::Point(85, 337);
+			   this->Number7->Name = L"Number7";
+			   this->Number7->Size = System::Drawing::Size(67, 50);
+			   this->Number7->TabIndex = 38;
+			   this->Number7->Text = L"7";
+			   this->Number7->UseVisualStyleBackColor = false;
+			   this->Number7->Click += gcnew System::EventHandler(this, &MyForm::button33_Click);
+			   // 
+			   // Number8
+			   // 
+			   this->Number8->BackColor = System::Drawing::SystemColors::ButtonHighlight;
+			   this->Number8->Location = System::Drawing::Point(158, 337);
+			   this->Number8->Name = L"Number8";
+			   this->Number8->Size = System::Drawing::Size(67, 50);
+			   this->Number8->TabIndex = 39;
+			   this->Number8->Text = L"8";
+			   this->Number8->UseVisualStyleBackColor = false;
+			   this->Number8->Click += gcnew System::EventHandler(this, &MyForm::button34_Click);
+			   // 
+			   // Number9
+			   // 
+			   this->Number9->BackColor = System::Drawing::SystemColors::ButtonHighlight;
+			   this->Number9->Location = System::Drawing::Point(230, 337);
+			   this->Number9->Name = L"Number9";
+			   this->Number9->Size = System::Drawing::Size(67, 50);
+			   this->Number9->TabIndex = 40;
+			   this->Number9->Text = L"9";
+			   this->Number9->UseVisualStyleBackColor = false;
+			   this->Number9->Click += gcnew System::EventHandler(this, &MyForm::button35_Click);
 			   // 
 			   // textBox2
 			   // 
@@ -537,41 +681,41 @@ namespace Calculator2WinForm {
 			   this->AutoSizeMode = System::Windows::Forms::AutoSizeMode::GrowAndShrink;
 			   this->ClientSize = System::Drawing::Size(382, 568);
 			   this->Controls->Add(this->textBox2);
-			   this->Controls->Add(this->button35);
-			   this->Controls->Add(this->button34);
-			   this->Controls->Add(this->button33);
-			   this->Controls->Add(this->button32);
-			   this->Controls->Add(this->button31);
-			   this->Controls->Add(this->button30);
-			   this->Controls->Add(this->button29);
-			   this->Controls->Add(this->button28);
-			   this->Controls->Add(this->button27);
-			   this->Controls->Add(this->button26);
-			   this->Controls->Add(this->button25);
-			   this->Controls->Add(this->button24);
-			   this->Controls->Add(this->button23);
-			   this->Controls->Add(this->button22);
-			   this->Controls->Add(this->button21);
-			   this->Controls->Add(this->button20);
-			   this->Controls->Add(this->button19);
-			   this->Controls->Add(this->button18);
-			   this->Controls->Add(this->button17);
-			   this->Controls->Add(this->button16);
-			   this->Controls->Add(this->button15);
-			   this->Controls->Add(this->button14);
-			   this->Controls->Add(this->button13);
-			   this->Controls->Add(this->button12);
-			   this->Controls->Add(this->button11);
-			   this->Controls->Add(this->button10);
-			   this->Controls->Add(this->button9);
-			   this->Controls->Add(this->button8);
-			   this->Controls->Add(this->button7);
-			   this->Controls->Add(this->button6);
-			   this->Controls->Add(this->button5);
-			   this->Controls->Add(this->button4);
-			   this->Controls->Add(this->button3);
-			   this->Controls->Add(this->button2);
-			   this->Controls->Add(this->button1);
+			   this->Controls->Add(this->Number9);
+			   this->Controls->Add(this->Number8);
+			   this->Controls->Add(this->Number7);
+			   this->Controls->Add(this->Number6);
+			   this->Controls->Add(this->Number5);
+			   this->Controls->Add(this->Number4);
+			   this->Controls->Add(this->Number3);
+			   this->Controls->Add(this->Number2);
+			   this->Controls->Add(this->Number1);
+			   this->Controls->Add(this->Number0);
+			   this->Controls->Add(this->equals);
+			   this->Controls->Add(this->Dot);
+			   this->Controls->Add(this->CloseBracket);
+			   this->Controls->Add(this->OpenBracket);
+			   this->Controls->Add(this->Plus);
+			   this->Controls->Add(this->ReversePlusMinus);
+			   this->Controls->Add(this->Minus);
+			   this->Controls->Add(this->factorial);
+			   this->Controls->Add(this->multiply);
+			   this->Controls->Add(this->NumberPi);
+			   this->Controls->Add(this->divide);
+			   this->Controls->Add(this->Backspace);
+			   this->Controls->Add(this->Clear);
+			   this->Controls->Add(this->ClearAll);
+			   this->Controls->Add(this->ndPower2);
+			   this->Controls->Add(this->Mod);
+			   this->Controls->Add(this->exponent);
+			   this->Controls->Add(this->Log);
+			   this->Controls->Add(this->Power10X);
+			   this->Controls->Add(this->Sqrt);
+			   this->Controls->Add(this->Tan);
+			   this->Controls->Add(this->Cos);
+			   this->Controls->Add(this->Sin);
+			   this->Controls->Add(this->powerXY);
+			   this->Controls->Add(this->powerX2);
 			   this->Controls->Add(this->textBox1);
 			   this->Name = L"MyForm";
 			   this->StartPosition = System::Windows::Forms::FormStartPosition::WindowsDefaultBounds;
@@ -617,16 +761,17 @@ namespace Calculator2WinForm {
 	private: System::Void button35_Click(System::Object^ sender, System::EventArgs^ e) {
 		numberInput("9");
 	}
-
 	private: System::Void button13_Click(System::Object^ sender, System::EventArgs^ e) { // C
 		textBox1->Text = "0";
+		Obracket = 0;
+		Cbracket = 0;
 	}
 	private: System::Void button12_Click(System::Object^ sender, System::EventArgs^ e) { // CE
 		textBox1->Text = "0";
 		textBox2->Text = "";
+		Obracket = 0;
+		Cbracket = 0;
 	}
-
-
 	private: System::Void button14_Click(System::Object^ sender, System::EventArgs^ e) { // delete last symbol, backspace
 		String^ str = textBox1->Text;
 		if (textBox1->Text->Length > 0) str = textBox1->Text->Substring(0, textBox1->Text->Length - 1);
@@ -639,7 +784,6 @@ namespace Calculator2WinForm {
 
 		textBox1->Text = str;
 	}
-
 	private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e) { // x^2	x^3
 		if (ndSelector == 0) {
 			String^ str = textBox1->Text;
@@ -657,13 +801,13 @@ namespace Calculator2WinForm {
 	private: System::Void button2_Click(System::Object^ sender, System::EventArgs^ e) { //x^y	sqrt(x), y
 		if (ndSelector == 0) {
 			String^ str = textBox1->Text;
-			textBox2->Text += System::Convert::ToString(str) + "^";
+			textBox2->Text += System::Convert::ToString(str) + " ^ ";
 			textBox1->Text = str;
 			TextBoxZeroCounter = 0;
 		}
 		else if (ndSelector == 1) {
 			String^ str = textBox1->Text;
-			textBox2->Text += System::Convert::ToString(str) + "s";
+			textBox2->Text += System::Convert::ToString(str) + " s ";
 			textBox1->Text = str;
 			TextBoxZeroCounter = 0;
 		}
@@ -765,7 +909,7 @@ namespace Calculator2WinForm {
 	private: System::Void button10_Click(System::Object^ sender, System::EventArgs^ e) { // Mod deg
 		if (ndSelector == 0) {
 			String^ str = textBox1->Text;
-			textBox2->Text += System::Convert::ToString(str) + "%";
+			textBox2->Text += System::Convert::ToString(str) + " % ";
 			textBox1->Text = str;
 			TextBoxZeroCounter = 0;
 		}
@@ -774,35 +918,37 @@ namespace Calculator2WinForm {
 	}
 	private: System::Void button11_Click(System::Object^ sender, System::EventArgs^ e) { //2^nd 
 		if (ndSelector == 1) {
-			button1->Text = "x^2";
-			button2->Text = "x^y";
-			button3->Text = "sin";
-			button4->Text = "cos";
-			button5->Text = "tan";
-			button6->Text = "sqrt(x)";
-			button7->Text = "10^x";
-			button8->Text = "log";
-			button9->Text = "Exp";
-			button10->Text = "Mod";
+			powerX2->Text = "x^2";
+			powerXY->Text = "x^y";
+			Sin->Text = "sin";
+			Cos->Text = "cos";
+			Tan->Text = "tan";
+			Sqrt->Text = "sqrt(x)";
+			Power10X->Text = "10^x";
+			Log->Text = "log";
+			exponent->Text = "Exp";
+			Mod->Text = "Mod";
+
 			ndSelector = 0;
 		}
 		else if (ndSelector == 0) {
-			button1->Text = "x^3";
-			button2->Text = "sqrt(x), y";
-			button3->Text = "sin^-1";
-			button4->Text = "cos^-1";
-			button5->Text = "tan^-1";
-			button6->Text = "1/x";
-			button7->Text = "e^x";
-			button8->Text = "ln";
-			button9->Text = "dms";
-			button10->Text = "deg";
+			powerX2->Text = "x^3";
+			powerXY->Text = "sqrt(x), y";
+			Sin->Text = "sin^-1";
+			Cos->Text = "cos^-1";
+			Tan->Text = "tan^-1";
+			Sqrt->Text = "1/x";
+			Power10X->Text = "e^x";
+			Log->Text = "ln";
+			exponent->Text = "dms";
+			Mod->Text = "deg";
+
 			ndSelector = 1;
 		}
 	}
 	private: System::Void button15_Click(System::Object^ sender, System::EventArgs^ e) { // /
 		String^ str = textBox1->Text;
-		textBox2->Text += System::Convert::ToString(str) + "/";
+		textBox2->Text += System::Convert::ToString(str) + " / ";
 		textBox1->Text = str;
 		TextBoxZeroCounter = 0;
 	}
@@ -811,7 +957,7 @@ namespace Calculator2WinForm {
 	}
 	private: System::Void button17_Click(System::Object^ sender, System::EventArgs^ e) { // *
 		String^ str = textBox1->Text;
-		textBox2->Text += System::Convert::ToString(str) + "*";
+		textBox2->Text += System::Convert::ToString(str) + " * ";
 		textBox1->Text = str;
 		TextBoxZeroCounter = 0;
 	}
@@ -828,7 +974,7 @@ namespace Calculator2WinForm {
 	}
 	private: System::Void button19_Click(System::Object^ sender, System::EventArgs^ e) { // -
 		String^ str = textBox1->Text;
-		textBox2->Text += System::Convert::ToString(str) + "-";
+		textBox2->Text += System::Convert::ToString(str) + " - ";
 		textBox1->Text = str;
 		TextBoxZeroCounter = 0;
 	}
@@ -840,29 +986,29 @@ namespace Calculator2WinForm {
 	}
 	private: System::Void button21_Click(System::Object^ sender, System::EventArgs^ e) { // +
 		String^ str = textBox1->Text;
-		textBox2->Text += System::Convert::ToString(str) + "+";
+		textBox2->Text += System::Convert::ToString(str) + " + ";
 		textBox1->Text = str;
 		TextBoxZeroCounter = 0;
 	}
-	private: System::Void button24_Click(System::Object^ sender, System::EventArgs^ e) { /* "," */
-		if (textBox1->Text->LastIndexOf(",") == -1) {
-			numberInput(",");
+	private: System::Void button24_Click(System::Object^ sender, System::EventArgs^ e) { /* "." */
+		if (textBox1->Text->LastIndexOf(".") == -1) {
+			numberInput(".");
 		}
 	}
 	private: System::Void button22_Click(System::Object^ sender, System::EventArgs^ e) { // (
 		Obracket++;
-		numberInput("(");
+		numberInput(" ( ");
 	}
 	private: System::Void button23_Click(System::Object^ sender, System::EventArgs^ e) { // )
 		if (Cbracket < Obracket) {
-			numberInput(")");
+			numberInput(" ) ");
 			Cbracket++;
 		}
 	}
 	private: System::Void button25_Click(System::Object^ sender, System::EventArgs^ e) { // =
 
 		while (Cbracket != Obracket) {
-			numberInput(")");
+			numberInput(" ) ");
 			Cbracket++;
 		}
 
@@ -874,14 +1020,9 @@ namespace Calculator2WinForm {
 		}
 
 		std::string sstr = msclr::interop::marshal_as<std::string>(str);
-		char charArray[100] = {0};
-		strcpy(charArray, sstr.c_str());
-		float answ = RPN(charArray);
-
-		textBox1->Text = System::Convert::ToString(answ);
+		textBox1->Text = System::Convert::ToString(RPN(sstr));
 		textBox2->Text = "";
 		TextBoxZeroCounter = 2;
-
 	}
 	};
 }

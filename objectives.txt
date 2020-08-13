@@ -1,8 +1,8 @@
-1. Convert 2 .sln and 2 projects into 1 .sln and two projects.
-2. Rewrite the code from DLL into processing negative and real numbers.
-3. Take the implementation out of the GUI, add an exception.
-4. Add a handler for pressing keyboard buttons.
+1. Convert 2 .sln and 2 projects into 1 .sln and two projects. // check
+2. Rewrite the code from DLL into processing negative and real numbers. // check
+3. Rename buttons. // check
+4. Take the implementation out of the GUI, add an exception.
 5. Change the name and icon of the application.
-6. Rename buttons.
+6. Add a handler for pressing keyboard buttons.
 7. Add error output to log file.
 8. Add unit tests.
