@@ -103,6 +103,7 @@ namespace Calculator2WinForm {
 			   std::vector<std::string> result{
 				   std::sregex_token_iterator(inString.begin(), inString.end(), ws_re, -1), {}
 			   };
+			   
 			   for (unsigned int i = 0; i < result.size(); i++) {
 				   ReverseStack.push(result[i]);
 			   }
@@ -121,9 +122,12 @@ namespace Calculator2WinForm {
 			   while (!inp.empty()) {
 				   std::string str = inp.top();
 				   inp.pop();
-				   size_t foundIsdigitAndMin = str.find_first_not_of("1234567890.-");
+				   size_t foundIsdigitAndMin = str.find_first_not_of("1234567890,-");
 				   if (foundIsdigitAndMin == std::string::npos && str != "-") {
-						exitString.push(str);
+					   if (str.find(",") != std::string::npos) {
+						str.replace(str.find(","), sizeof(",") - 1, ".");
+					   }
+                        exitString.push(str);
 				   }
 				   if (str == "(") {
 					   funcStack.push(str);
@@ -719,7 +723,7 @@ namespace Calculator2WinForm {
 			   this->Controls->Add(this->textBox1);
 			   this->Name = L"MyForm";
 			   this->StartPosition = System::Windows::Forms::FormStartPosition::WindowsDefaultBounds;
-			   this->Text = L"MyForm";
+			   this->Text = L"Calculator";
 			   this->Load += gcnew System::EventHandler(this, &MyForm::MyForm_Load);
 			   this->ResumeLayout(false);
 			   this->PerformLayout();
@@ -990,9 +994,9 @@ namespace Calculator2WinForm {
 		textBox1->Text = str;
 		TextBoxZeroCounter = 0;
 	}
-	private: System::Void button24_Click(System::Object^ sender, System::EventArgs^ e) { /* "." */
-		if (textBox1->Text->LastIndexOf(".") == -1) {
-			numberInput(".");
+	private: System::Void button24_Click(System::Object^ sender, System::EventArgs^ e) { /* "," */
+		if (textBox1->Text->LastIndexOf(",") == -1) {
+			numberInput(",");
 		}
 	}
 	private: System::Void button22_Click(System::Object^ sender, System::EventArgs^ e) { // (
