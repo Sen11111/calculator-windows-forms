@@ -1,0 +1,3 @@
+C:\Users\Shade\Documents\GitHub\calculator-windows-forms\Calculator\Calculator\x64\Release\Calculator.vcxprojAssemblyReference.cache
+C:\Users\Shade\Documents\GitHub\calculator-windows-forms\Calculator\Calculator\x64\Release\Calculator.MyForm.resources
+C:\Users\Shade\Documents\GitHub\calculator-windows-forms\Calculator\Calculator\x64\Release\Calculator.vcxproj.GenerateResource.cache

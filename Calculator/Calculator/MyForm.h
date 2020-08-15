@@ -77,22 +77,38 @@ namespace Calculator2WinForm {
 	int Obracket = 0;
 	int Cbracket = 0;
 	int ndSelector = 0;
+	int factI = 0;
 
 	private: System::Void numberInput(System::String^ numVariable) {
-		String^ str = textBox1->Text;
-		if (str == "0") { textBox1->Text = numVariable; }
-		else if (textBox2->Text->LastIndexOf('+') > 0 && TextBoxZeroCounter == 0
-				 || textBox2->Text->LastIndexOf('-') > 0 && TextBoxZeroCounter == 0
-				 || textBox2->Text->LastIndexOf('*') > 0 && TextBoxZeroCounter == 0
-				 || textBox2->Text->LastIndexOf('/') > 0 && TextBoxZeroCounter == 0
-				 || textBox2->Text->LastIndexOf('^') > 0 && TextBoxZeroCounter == 0
-				 || textBox2->Text->LastIndexOf('%') > 0 && TextBoxZeroCounter == 0
-				 || textBox2->Text->LastIndexOf('s') > 0 && TextBoxZeroCounter == 0
-				 || TextBoxZeroCounter == 2) {
-			textBox1->Text = numVariable;
-			TextBoxZeroCounter = 1;
+		String^ tb1;
+		try {
+			String^ str = textBox1->Text;
+			tb1 = str;
+			if (str == "0") {
+				textBox1->Text = numVariable;
+			}
+			else if (textBox2->Text->LastIndexOf('+') > 0 && TextBoxZeroCounter == 0
+					 || textBox2->Text->LastIndexOf('-') > 0 && TextBoxZeroCounter == 0
+					 || textBox2->Text->LastIndexOf('*') > 0 && TextBoxZeroCounter == 0
+					 || textBox2->Text->LastIndexOf('/') > 0 && TextBoxZeroCounter == 0
+					 || textBox2->Text->LastIndexOf('^') > 0 && TextBoxZeroCounter == 0
+					 || textBox2->Text->LastIndexOf('%') > 0 && TextBoxZeroCounter == 0
+					 || textBox2->Text->LastIndexOf('s') > 0 && TextBoxZeroCounter == 0
+					 || TextBoxZeroCounter == 2) {
+				textBox1->Text = numVariable;
+				TextBoxZeroCounter = 1;
+			}
+			else {
+				if (str->Length < 10) {
+					textBox1->Text = str + numVariable;
+				}
+			}
 		}
-		else { if (str->Length < 10) { textBox1->Text = str + numVariable; } }
+		catch (...) {
+			FILE* LogFile = fopen("Exceptions.log", "a+");
+			fprintf(LogFile, "%s, %s\n", __FUNCTION__, tb1);
+			fclose(LogFile);
+		}
 	}
 
 		   double RPN(std::string inString) {
@@ -244,9 +260,18 @@ namespace Calculator2WinForm {
 		   }
 
 	private: System::Double fact(double N) {
-		if (N < 0) return 0;
-		if (N == 0) return 1;
-		else return N * fact(N - 1);
+		String^ tb1;
+		factI++;
+		try {
+			if (N < 0) return 0;
+			if (N == 0) return 1;
+			else return N * fact(N - 1);
+		}
+		catch (...) {
+			FILE* LogFile = fopen("Exceptions.log", "a+");
+			fprintf(LogFile, "%s, %s, %s\n", __FUNCTION__, tb1, factI);
+			fclose(LogFile);
+		}
 	}
 
 	private: System::ComponentModel::IContainer^ components;
@@ -777,137 +802,235 @@ namespace Calculator2WinForm {
 		Cbracket = 0;
 	}
 	private: System::Void button14_Click(System::Object^ sender, System::EventArgs^ e) { // delete last symbol, backspace
-		String^ str = textBox1->Text;
-		if (textBox1->Text->Length > 0) str = textBox1->Text->Substring(0, textBox1->Text->Length - 1);
-		if ((textBox1->Text == "0") && (textBox2->Text->Length > 0)) {
-			textBox1->Text = textBox2->Text;
-			textBox2->Text = "";
-			str = textBox1->Text->Substring(0, textBox1->Text->Length - 1);
-		}
-		if (textBox1->Text->Length == 1 || (textBox1->Text->Length == 2 && textBox1->Text->LastIndexOf("-") == 0)) str = "0";
+		String^ tb1;
+		try {
+			String^ str = textBox1->Text;
+			tb1 = str;
+			if (textBox1->Text->Length > 0) str = textBox1->Text->Substring(0, textBox1->Text->Length - 1);
+			if ((textBox1->Text == "0") && (textBox2->Text->Length > 0)) {
+				textBox1->Text = textBox2->Text;
+				textBox2->Text = "";
+				str = textBox1->Text->Substring(0, textBox1->Text->Length - 1);
+			}
+			if (textBox1->Text->Length == 1 || (textBox1->Text->Length == 2 && textBox1->Text->LastIndexOf("-") == 0)) str = "0";
 
-		textBox1->Text = str;
+			textBox1->Text = str;
+		}
+		catch (...) {
+			FILE* LogFile = fopen("Exceptions.log", "a+");
+			fprintf(LogFile, "%s, %s\n", __FUNCTION__, tb1);
+			fclose(LogFile);
+		}
 	}
 	private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e) { // x^2	x^3
-		if (ndSelector == 0) {
-			String^ str = textBox1->Text;
-			double temp = System::Convert::ToDouble(str);
-			temp *= temp;
-			textBox1->Text = System::Convert::ToString(temp);
+		String^ tb1;
+		try {
+			if (ndSelector == 0) {
+				String^ str = textBox1->Text;
+				tb1 = str;
+				double temp = System::Convert::ToDouble(str);
+				temp *= temp;
+				textBox1->Text = System::Convert::ToString(temp);
+			}
+			else if (ndSelector == 1) {
+				String^ str = textBox1->Text;
+				tb1 = str;
+				double temp = System::Convert::ToDouble(str);
+				temp *= temp * temp;
+				textBox1->Text = System::Convert::ToString(temp);
+			}
 		}
-		else if (ndSelector == 1) {
-			String^ str = textBox1->Text;
-			double temp = System::Convert::ToDouble(str);
-			temp *= temp * temp;
-			textBox1->Text = System::Convert::ToString(temp);
+		catch (...) {
+			FILE* LogFile = fopen("Exceptions.log", "a+");
+			fprintf(LogFile, "%s, %s\n", __FUNCTION__, tb1);
+			fclose(LogFile);
 		}
 	}
 	private: System::Void button2_Click(System::Object^ sender, System::EventArgs^ e) { //x^y	sqrt(x), y
-		if (ndSelector == 0) {
-			String^ str = textBox1->Text;
-			textBox2->Text += System::Convert::ToString(str) + " ^ ";
-			textBox1->Text = str;
-			TextBoxZeroCounter = 0;
+		String^ tb1;
+		try {
+			if (ndSelector == 0) {
+				String^ str = textBox1->Text;
+				tb1 = str;
+				textBox2->Text += System::Convert::ToString(str) + " ^ ";
+				textBox1->Text = str;
+				TextBoxZeroCounter = 0;
+			}
+			else if (ndSelector == 1) {
+				String^ str = textBox1->Text;
+				tb1 = str;
+				textBox2->Text += System::Convert::ToString(str) + " s ";
+				textBox1->Text = str;
+				TextBoxZeroCounter = 0;
+			}
 		}
-		else if (ndSelector == 1) {
-			String^ str = textBox1->Text;
-			textBox2->Text += System::Convert::ToString(str) + " s ";
-			textBox1->Text = str;
-			TextBoxZeroCounter = 0;
+		catch (...) {
+			FILE* LogFile = fopen("Exceptions.log", "a+");
+			fprintf(LogFile, "%s, %s\n", __FUNCTION__, tb1);
+			fclose(LogFile);
 		}
 	}
 	private: System::Void button3_Click(System::Object^ sender, System::EventArgs^ e) { //sin	sin^-1 
-		if (ndSelector == 0) {
-			String^ str = textBox1->Text;
-			double temp = System::Convert::ToDouble(str);
-			temp = sin(temp);
-			textBox1->Text = System::Convert::ToString(temp);
+		String^ tb1;
+		try {
+			if (ndSelector == 0) {
+				String^ str = textBox1->Text;
+				tb1 = str;
+				double temp = System::Convert::ToDouble(str);
+				temp = sin(temp);
+				textBox1->Text = System::Convert::ToString(temp);
+			}
+			else if (ndSelector == 1) {
+				String^ str = textBox1->Text;
+				tb1 = str;
+				double temp = System::Convert::ToDouble(str);
+				temp = 1 / (sin(temp));
+				textBox1->Text = System::Convert::ToString(temp);
+			}
 		}
-		else if (ndSelector == 1) {
-			String^ str = textBox1->Text;
-			double temp = System::Convert::ToDouble(str);
-			temp = 1 / (sin(temp));
-			textBox1->Text = System::Convert::ToString(temp);
+		catch (...) {
+			FILE* LogFile = fopen("Exceptions.log", "a+");
+			fprintf(LogFile, "%s, %s\n", __FUNCTION__, tb1);
+			fclose(LogFile);
 		}
 	}
 	private: System::Void button4_Click(System::Object^ sender, System::EventArgs^ e) { //cos cos^-1 
-		if (ndSelector == 0) {
-			String^ str = textBox1->Text;
-			double temp = System::Convert::ToDouble(str);
-			temp = cos(temp);
-			textBox1->Text = System::Convert::ToString(temp);
+		String^ tb1;
+		try {
+			if (ndSelector == 0) {
+				String^ str = textBox1->Text;
+				tb1 = str;
+				double temp = System::Convert::ToDouble(str);
+				temp = cos(temp);
+				textBox1->Text = System::Convert::ToString(temp);
+			}
+			else if (ndSelector == 1) {
+				String^ str = textBox1->Text;
+				tb1 = str;
+				double temp = System::Convert::ToDouble(str);
+				temp = 1 / (cos(temp));
+				textBox1->Text = System::Convert::ToString(temp);
+			}
 		}
-		else if (ndSelector == 1) {
-			String^ str = textBox1->Text;
-			double temp = System::Convert::ToDouble(str);
-			temp = 1 / (cos(temp));
-			textBox1->Text = System::Convert::ToString(temp);
+		catch (...) {
+			FILE* LogFile = fopen("Exceptions.log", "a+");
+			fprintf(LogFile, "%s, %s\n", __FUNCTION__, tb1);
+			fclose(LogFile);
 		}
 	}
 	private: System::Void button5_Click(System::Object^ sender, System::EventArgs^ e) { //tan	tan^-1 
-		if (ndSelector == 0) {
-			String^ str = textBox1->Text;
-			double temp = System::Convert::ToDouble(str);
-			temp = tan(temp);
-			textBox1->Text = System::Convert::ToString(temp);
+		String^ tb1;
+		try {
+			if (ndSelector == 0) {
+				String^ str = textBox1->Text;
+				tb1 = str;
+				double temp = System::Convert::ToDouble(str);
+				temp = tan(temp);
+				textBox1->Text = System::Convert::ToString(temp);
+			}
+			else if (ndSelector == 1) {
+				String^ str = textBox1->Text;
+				tb1 = str;
+				double temp = System::Convert::ToDouble(str);
+				temp = 1 / (tan(temp));
+				textBox1->Text = System::Convert::ToString(temp);
+			}
 		}
-		else if (ndSelector == 1) {
-			String^ str = textBox1->Text;
-			double temp = System::Convert::ToDouble(str);
-			temp = 1 / (tan(temp));
-			textBox1->Text = System::Convert::ToString(temp);
+		catch (...) {
+			FILE* LogFile = fopen("Exceptions.log", "a+");
+			fprintf(LogFile, "%s, %s\n", __FUNCTION__, tb1);
+			fclose(LogFile);
 		}
 	}
 	private: System::Void button6_Click(System::Object^ sender, System::EventArgs^ e) { //sqrt(x)	1/x
-		if (ndSelector == 0) {
-			String^ str = textBox1->Text;
-			double temp = System::Convert::ToDouble(str);
-			temp = sqrt(temp);
-			textBox1->Text = System::Convert::ToString(temp);
+		String^ tb1;
+		try {
+			if (ndSelector == 0) {
+				String^ str = textBox1->Text;
+				tb1 = str;
+				double temp = System::Convert::ToDouble(str);
+				temp = sqrt(temp);
+				textBox1->Text = System::Convert::ToString(temp);
+			}
+			else if (ndSelector == 1) {
+				String^ str = textBox1->Text;
+				tb1 = str;
+				double temp = System::Convert::ToDouble(str);
+				temp = 1 / temp;
+				textBox1->Text = System::Convert::ToString(temp);
+			}
 		}
-		else if (ndSelector == 1) {
-			String^ str = textBox1->Text;
-			double temp = System::Convert::ToDouble(str);
-			temp = 1 / temp;
-			textBox1->Text = System::Convert::ToString(temp);
+		catch (...) {
+			FILE* LogFile = fopen("Exceptions.log", "a+");
+			fprintf(LogFile, "%s, %s\n", __FUNCTION__, tb1);
+			fclose(LogFile);
 		}
 	}
 	private: System::Void button7_Click(System::Object^ sender, System::EventArgs^ e) { // 10^x	e^x
-		if (ndSelector == 0) {
-			String^ str = textBox1->Text;
-			double temp = System::Convert::ToDouble(str);
-			temp = pow(10, temp);
-			textBox1->Text = System::Convert::ToString(temp);
+		String^ tb1;
+		try {
+			if (ndSelector == 0) {
+				String^ str = textBox1->Text;
+				tb1 = str;
+				double temp = System::Convert::ToDouble(str);
+				temp = pow(10, temp);
+				textBox1->Text = System::Convert::ToString(temp);
+			}
+			else if (ndSelector == 1) {
+				String^ str = textBox1->Text;
+				tb1 = str;
+				double temp = System::Convert::ToDouble(str);
+				temp = pow(ee, temp);
+				textBox1->Text = System::Convert::ToString(temp);
+			}
 		}
-		else if (ndSelector == 1) {
-			String^ str = textBox1->Text;
-			double temp = System::Convert::ToDouble(str);
-			temp = pow(ee, temp);
-			textBox1->Text = System::Convert::ToString(temp);
+		catch (...) {
+			FILE* LogFile = fopen("Exceptions.log", "a+");
+			fprintf(LogFile, "%s, %s\n", __FUNCTION__, tb1);
+			fclose(LogFile);
 		}
 	}
 	private: System::Void button8_Click(System::Object^ sender, System::EventArgs^ e) { // log	ln
-		if (ndSelector == 0) {
-			String^ str = textBox1->Text;
-			double temp = System::Convert::ToDouble(str);
-			temp = log10(temp);
-			textBox1->Text = System::Convert::ToString(temp);
+		String^ tb1;
+		try {
+			if (ndSelector == 0) {
+				String^ str = textBox1->Text;
+				tb1 = str;
+				double temp = System::Convert::ToDouble(str);
+				temp = log10(temp);
+				textBox1->Text = System::Convert::ToString(temp);
+			}
+			else if (ndSelector == 1) {
+				String^ str = textBox1->Text;
+				tb1 = str;
+				double temp = System::Convert::ToDouble(str);
+				temp = log(temp);
+				textBox1->Text = System::Convert::ToString(temp);
+			}
 		}
-		else if (ndSelector == 1) {
-			String^ str = textBox1->Text;
-			double temp = System::Convert::ToDouble(str);
-			temp = log(temp);
-			textBox1->Text = System::Convert::ToString(temp);
+		catch (...) {
+			FILE* LogFile = fopen("Exceptions.log", "a+");
+			fprintf(LogFile, "%s, %s\n", __FUNCTION__, tb1);
+			fclose(LogFile);
 		}
 	}
 	private: System::Void button9_Click(System::Object^ sender, System::EventArgs^ e) { // Exp	dms
-		if (ndSelector == 0) {
-			String^ str = textBox1->Text;
-			double temp = System::Convert::ToDouble(str);
-			temp = exp(temp);
-			textBox1->Text = System::Convert::ToString(temp);
+		String^ tb1;
+		try {
+			if (ndSelector == 0) {
+				String^ str = textBox1->Text;
+				tb1 = str;
+				double temp = System::Convert::ToDouble(str);
+				temp = exp(temp);
+				textBox1->Text = System::Convert::ToString(temp);
+			}
+			else if (ndSelector == 1) {
+			}
 		}
-		else if (ndSelector == 1) {
+		catch (...) {
+			FILE* LogFile = fopen("Exceptions.log", "a+");
+			fprintf(LogFile, "%s, %s\n", __FUNCTION__, tb1);
+			fclose(LogFile);
 		}
 	}
 	private: System::Void button10_Click(System::Object^ sender, System::EventArgs^ e) { // Mod deg
@@ -966,15 +1089,24 @@ namespace Calculator2WinForm {
 		TextBoxZeroCounter = 0;
 	}
 	private: System::Void button18_Click(System::Object^ sender, System::EventArgs^ e) { // !n
-		double ch = System::Convert::ToDouble(textBox1->Text);
-		double whole = 0.0, fractional = 0.0;
-		fractional = modf(ch, &whole);
-		if (fractional == 0.) {
-			textBox1->Text = System::Convert::ToString(fact(ch));
+		String^ tb1;
+		try {
+			tb1 = textBox1->Text;
+			double ch = System::Convert::ToDouble(textBox1->Text);
+			double whole = 0.0, fractional = 0.0;
+			fractional = modf(ch, &whole);
+			if (fractional == 0.) {
+				textBox1->Text = System::Convert::ToString(fact(ch));
+			}
+			else
+				textBox1->Text = System::Convert::ToString(std::tgamma(ch + 1));
+			factI = 0;
 		}
-		else
-			textBox1->Text = System::Convert::ToString(std::tgamma(ch + 1));
-
+		catch (...) {
+			FILE* LogFile = fopen("Exceptions.log", "a+");
+			fprintf(LogFile, "%s, %s\n", __FUNCTION__, tb1);
+			fclose(LogFile);
+		}
 	}
 	private: System::Void button19_Click(System::Object^ sender, System::EventArgs^ e) { // -
 		String^ str = textBox1->Text;
@@ -983,10 +1115,19 @@ namespace Calculator2WinForm {
 		TextBoxZeroCounter = 0;
 	}
 	private: System::Void button20_Click(System::Object^ sender, System::EventArgs^ e) { // "+/-"
-		String^ str = textBox1->Text;
-		double temp = System::Convert::ToDouble(str);
-		temp = temp * -1;
-		textBox1->Text = System::Convert::ToString(temp);
+		String^ tb1;
+		try {
+			String^ str = textBox1->Text;
+			tb1 = str;
+			double temp = System::Convert::ToDouble(str);
+			temp = temp * -1;
+			textBox1->Text = System::Convert::ToString(temp);
+		}
+		catch (...) {
+			FILE* LogFile = fopen("Exceptions.log", "a+");
+			fprintf(LogFile, "%s, %s\n", __FUNCTION__, tb1);
+			fclose(LogFile);
+		}
 	}
 	private: System::Void button21_Click(System::Object^ sender, System::EventArgs^ e) { // +
 		String^ str = textBox1->Text;
@@ -1010,23 +1151,33 @@ namespace Calculator2WinForm {
 		}
 	}
 	private: System::Void button25_Click(System::Object^ sender, System::EventArgs^ e) { // =
+		String^ tb1;
+		try {
+			while (Cbracket != Obracket) {
+				numberInput(" ) ");
+				Cbracket++;
+			}
 
-		while (Cbracket != Obracket) {
-			numberInput(" ) ");
-			Cbracket++;
+			String^ str = textBox2->Text + textBox1->Text;
+			tb1 = str;
+
+			if (str->Contains("/0")) {
+				textBox1->Text = "Cannot divide by zero";
+				return;
+			}
+
+			std::string sstr = msclr::interop::marshal_as<std::string>(str);
+
+			textBox1->Text = System::Convert::ToString(RPN(sstr));
+			textBox2->Text = "";
+			TextBoxZeroCounter = 2;
 		}
-
-		String^ str = textBox2->Text + textBox1->Text;
-
-		if (str->Contains("/0")) {
-			textBox1->Text = "Cannot divide by zero";
-			return;
+		catch (...) {
+			FILE* LogFile = fopen("Exceptions.log", "a+");
+			fprintf(LogFile, "%s, %s\n", __FUNCTION__, tb1);
+			fclose(LogFile);
 		}
-
-		std::string sstr = msclr::interop::marshal_as<std::string>(str);
-		textBox1->Text = System::Convert::ToString(RPN(sstr));
-		textBox2->Text = "";
-		TextBoxZeroCounter = 2;
 	}
+
 	};
 }

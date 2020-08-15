@@ -3,6 +3,7 @@ C:\Users\Shade\Documents\GitHub\calculator-windows-forms\Calculator\Calculator\M
 C:\Users\Shade\Documents\GitHub\calculator-windows-forms\Calculator\Calculator\MyForm.h(108,20): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
 C:\Users\Shade\Documents\GitHub\calculator-windows-forms\Calculator\Calculator\MyForm.h(272,21): warning C4477: "fprintf": в строке форматирования "%s" требуется аргумент типа "char *", но вариативный аргумент "2" имеет тип "System::String ^"
 C:\Users\Shade\Documents\GitHub\calculator-windows-forms\Calculator\Calculator\MyForm.h(272,21): warning C4477: "fprintf": в строке форматирования "%s" требуется аргумент типа "char *", но вариативный аргумент "3" имеет тип "int"
+C:\Users\Shade\Documents\GitHub\calculator-windows-forms\Calculator\Calculator\MyForm.h(272,21): warning C4313: fprintf: конфликт "%s" в строке формата с аргументом 3 типа "int"
 C:\Users\Shade\Documents\GitHub\calculator-windows-forms\Calculator\Calculator\MyForm.h(271,20): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
 C:\Users\Shade\Documents\GitHub\calculator-windows-forms\Calculator\Calculator\MyForm.h(821,21): warning C4477: "fprintf": в строке форматирования "%s" требуется аргумент типа "char *", но вариативный аргумент "2" имеет тип "System::String ^"
 C:\Users\Shade\Documents\GitHub\calculator-windows-forms\Calculator\Calculator\MyForm.h(820,20): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
@@ -30,6 +31,8 @@ C:\Users\Shade\Documents\GitHub\calculator-windows-forms\Calculator\Calculator\M
 C:\Users\Shade\Documents\GitHub\calculator-windows-forms\Calculator\Calculator\MyForm.h(1127,20): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
 C:\Users\Shade\Documents\GitHub\calculator-windows-forms\Calculator\Calculator\MyForm.h(1177,21): warning C4477: "fprintf": в строке форматирования "%s" требуется аргумент типа "char *", но вариативный аргумент "2" имеет тип "System::String ^"
 C:\Users\Shade\Documents\GitHub\calculator-windows-forms\Calculator\Calculator\MyForm.h(1176,20): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  .NETFramework,Version=v4.7.2.AssemblyAttributes.cpp
+  Создание кода...
 C:\Users\Shade\Documents\GitHub\calculator-windows-forms\Calculator\Calculator\MyForm.h(275): warning C4715: Calculator2WinForm::MyForm::fact: значение возвращается не при всех путях выполнения
   MyForm.obj : обнаружен модуль MSIL; для MSIL последовательная компоновка отключена; выполняется полная компоновка
-  Calculator.vcxproj -> C:\Users\Shade\Documents\GitHub\calculator-windows-forms\Calculator\Debug\Calculator.exe
+  Calculator.vcxproj -> C:\Users\Shade\Documents\GitHub\calculator-windows-forms\Calculator\x64\Release\Calculator.exe

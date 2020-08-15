@@ -3,5 +3,4 @@
 3. Rename buttons. // check
 4. Take the implementation out of the GUI, add an exception.
 5. Change the name. // check
-7. Add error output to log file.
-8. Add unit tests.
+6. Add error output to log file. // check
